@@ -7,9 +7,9 @@ const X_TOKEN = process.env.AZLYRICS_X as string;
 const bot = new Bot(botToken,X_TOKEN);
 const botHandler = bot.bot;
 
-botHandler.start((ctx) => ctx.reply('Welcome'))
+botHandler.start((ctx) => bot.sendStartMessage(ctx))
 
-botHandler.help((ctx) => ctx.reply('Send me a sticker'))
+botHandler.help((ctx) => bot.sendHelpMessage(ctx))
 
 botHandler.on('text', async (ctx) => {
     try{

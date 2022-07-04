@@ -1,4 +1,4 @@
-import { Context, Telegraf } from "telegraf";
+import { Context, Telegraf, Markup } from "telegraf";
 import { SongHandler,IslyricsOrSearch, ErrorOutput, ListData } from "./songHandler";
 
 export class Bot{
@@ -17,7 +17,43 @@ export class Bot{
                 return "internal error"
         }
     }
+    // user related
+    sendStartMessage(ctx: Context){
+        return ctx.replyWithMarkdown(`
+Hi 👋, Welcome to *lyrics-finder bot*
+i am your guide here.
+all the lyrics are from *https://www.azlyrics.com/*
 
+*/help for more detail*
+
+made with ❤️ by NAoHR (Najmi)
+        `,{
+            ...Markup.inlineKeyboard([
+                {
+                    text : "👨‍💻 source-code 👨‍💻",
+                    url : "https://github.com/NAoHR/lyrics-bot"
+                }
+            ])
+        })
+    }
+
+    sendHelpMessage(ctx: Context){
+        return ctx.replyWithMarkdown(`
+*📙 Usage:*
+\`<command> <argument>\`
+
+*Example:*
+\t\`/sbsong what is love\`
+\tthis command will search song with 'what is love' as its title
+
+\t\`/sblyric what is love\`
+\tthis command will search song containing 'what is love' in its lyric
+        `)
+    };
+
+
+
+    // feature related
     private parseFoundSong(arr: ListData): Array<ListData> {
         return arr.map((v)=> {
             return [v]
