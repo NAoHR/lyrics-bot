@@ -17,8 +17,14 @@ export class Bot{
                 return "internal error"
         }
     }
+    logger(activity: string, type="basic"){
+        const nowDate = new Date()
+        console.log(`[${nowDate.toLocaleDateString()} - ${nowDate.toLocaleTimeString()}] : ${activity}${type === "basic" ? " executed" : "!"}`);
+    }
+
     // user related
     sendStartMessage(ctx: Context){
+        this.logger("start")
         return ctx.replyWithMarkdown(`
 Hi 👋, Welcome to *lyrics-finder bot*
 i am your guide here.
@@ -38,6 +44,7 @@ made with ❤️ by NAoHR (Najmi)
     }
 
     sendHelpMessage(ctx: Context){
+        this.logger("help")
         return ctx.replyWithMarkdown(`
 *📙 Usage:*
 \`<command> <argument>\`
@@ -61,6 +68,7 @@ made with ❤️ by NAoHR (Najmi)
     }
     async songSearch(arg: string, parseType: IslyricsOrSearch,ssType: "lyrics" | "songs" ,ctx: Context) {
         try{
+            this.logger(`${ssType == "lyrics" ? "sblyric" : "sbsong"} ${arg}`);
             if(arg === ""){
                 return ctx.reply("🙅‍♂️ you didn't specify any song")
             }
@@ -105,6 +113,7 @@ result:
         return bucket;
     }
     async handleLyric(arg: string, ctx: Context){
+        this.logger(`getlyrics ${arg}`);
         if(arg === ""){
             return ctx.reply("🙅‍♂️ you didn't specify any song")
         }
@@ -119,7 +128,7 @@ result:
                 }
                 return ctx.replyWithMarkdown("✅ all done");
             }
-            return ctx.reply("❌ lyrics not found");
+            return ctx.replyWithAnimation("❌ lyrics not found");
         }
         return ctx.reply(this.errorHandler(reqLyric))
 

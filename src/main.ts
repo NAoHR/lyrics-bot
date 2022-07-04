@@ -14,15 +14,14 @@ botHandler.help((ctx) => bot.sendHelpMessage(ctx))
 botHandler.on('text', async (ctx) => {
     try{
         const command = ctx.message.text.split(" ") as Array<string>;
+        const requested = command.slice(1).join(" ");
 
         switch(command[0].slice(1)){
             case "sbsong":
-                await bot.songSearch(command.slice(1).join(" "), 'search', "songs", ctx);
+                await bot.songSearch(requested, 'search', "songs", ctx);
                 break
             case "sblyric":
-                await bot.songSearch(command.slice(1).join(" "), 'search', "lyrics", ctx);
-                break
-            default:
+                await bot.songSearch(requested, 'search', "lyrics", ctx);
                 break
         }
     }catch(e) {
@@ -48,7 +47,7 @@ botHandler.on("callback_query", async (ctx) => {
 
 botHandler.launch()
     .then(() => {
-        console.log("bot running");
+        bot.logger("bot is running", "start");
     })
     .catch((err) => {
         console.log(err)
