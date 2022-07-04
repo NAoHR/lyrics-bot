@@ -1,5 +1,5 @@
 import { Context, Telegraf } from "telegraf";
-import { SongHandler,IslyricsOrSearch } from "./songHandler";
+import { SongHandler,IslyricsOrSearch, ErrorOutput, ListData } from "./songHandler";
 
 export class Bot{
     bot: Telegraf;
@@ -9,20 +9,80 @@ export class Bot{
         this.bot = new Telegraf(token);
         this.songHanlder = new SongHandler(x_api);
     }
+    private errorHandler(e: ErrorOutput): string{
+        switch(e.code){
+            case "RNV":
+                return "song not found";
+            default:
+                return "internal error"
+        }
+    }
 
+    private parseFoundSong(arr: ListData): Array<ListData> {
+        return arr.map((v)=> {
+            return [v]
+        })
+    }
     async songSearch(arg: string, parseType: IslyricsOrSearch,ssType: "lyrics" | "songs" ,ctx: Context) {
         try{
-            const reqData = await this.songHanlder.requestData(this.songHanlder.parseArg(arg, parseType), parseType, ssType);
-            if(reqData){
-                let listOfSong = this.songHanlder.searchSongHandler(reqData, ssType);
-                console.log(listOfSong)
-                return ctx.reply("work coyy")
+            if(arg === ""){
+                return ctx.reply("you didn't specify any song")
             }
-            return ctx.reply("service is not working") // need to be fixed
+            const reqData = await this.songHanlder.requestData(this.songHanlder.parseArg(arg, parseType), parseType, ssType);
+            if(typeof reqData === "string"){
+                let listOfSong = this.songHanlder.searchSongHandler(reqData, ssType);
+
+                return ctx.reply(`song based on ${arg}\nFound ${listOfSong.length}`, {
+                    reply_markup : {
+                        inline_keyboard : this.parseFoundSong(listOfSong)
+                    }
+                });
+            }
+
+            return ctx.reply(this.errorHandler(reqData));
 
         }catch(e){
             console.log(e);
             return ctx.reply("service is error")
         }
+    }
+
+    private parseGivenLyrics(lyrics: string[]){
+        let bucket = [];
+        let miniBucket = "";
+
+        for(let lyric of lyrics){
+            let currentLength = lyric.length;
+            let mbLength = miniBucket.length;
+
+            if(mbLength + currentLength < 4096){
+                miniBucket += `${lyric}\n`
+            }else{
+                bucket.push(miniBucket)
+                miniBucket = ""
+            }
+        }
+        bucket.push(miniBucket);
+        return bucket;
+    }
+    async handleLyric(arg: string, ctx: Context){
+        if(arg === ""){
+            return ctx.reply("you didn't specify any song")
+        }
+
+        const reqLyric = await this.songHanlder.requestData(this.songHanlder.parseArg(arg, "lyrics"),"lyrics");
+        if(typeof reqLyric === "string"){
+            const allLyric = this.songHanlder.getLyrics(reqLyric);
+            if(allLyric){
+                let parsedLyric = this.parseGivenLyrics(allLyric);
+                for(let i of parsedLyric){
+                    ctx.reply(i);
+                }
+                return ctx.reply("all done");
+            }
+            return ctx.reply("lyrics not found");
+        }
+        return ctx.reply(this.errorHandler(reqLyric))
+
     }
 }
