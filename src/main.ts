@@ -38,6 +38,8 @@ botHandler.on("callback_query", async (ctx) => {
         let splitData = data.split(" ");
         switch(splitData[0]){
             case "getlyrics":
+                let seperateArtistTitle = splitData[1].split("_")
+                ctx.replyWithMarkdown(`⌛ getting *${seperateArtistTitle[1].split(".html").join("")}* by *${seperateArtistTitle[0]}*`)
                 await bot.handleLyric(splitData[1],ctx);
                 break
         }

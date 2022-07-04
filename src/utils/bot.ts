@@ -62,13 +62,16 @@ made with ❤️ by NAoHR (Najmi)
     async songSearch(arg: string, parseType: IslyricsOrSearch,ssType: "lyrics" | "songs" ,ctx: Context) {
         try{
             if(arg === ""){
-                return ctx.reply("you didn't specify any song")
+                return ctx.reply("🙅‍♂️ you didn't specify any song")
             }
             const reqData = await this.songHanlder.requestData(this.songHanlder.parseArg(arg, parseType), parseType, ssType);
             if(typeof reqData === "string"){
                 let listOfSong = this.songHanlder.searchSongHandler(reqData, ssType);
 
-                return ctx.reply(`song based on ${arg}\nFound ${listOfSong.length}`, {
+                return ctx.replyWithMarkdown(`
+🔍 found ${listOfSong.length} song(s) based on *${arg}*
+result:
+                `, {
                     reply_markup : {
                         inline_keyboard : this.parseFoundSong(listOfSong)
                     }
@@ -103,7 +106,7 @@ made with ❤️ by NAoHR (Najmi)
     }
     async handleLyric(arg: string, ctx: Context){
         if(arg === ""){
-            return ctx.reply("you didn't specify any song")
+            return ctx.reply("🙅‍♂️ you didn't specify any song")
         }
 
         const reqLyric = await this.songHanlder.requestData(this.songHanlder.parseArg(arg, "lyrics"),"lyrics");
@@ -114,9 +117,9 @@ made with ❤️ by NAoHR (Najmi)
                 for(let i of parsedLyric){
                     ctx.reply(i);
                 }
-                return ctx.reply("all done");
+                return ctx.replyWithMarkdown("✅ all done");
             }
-            return ctx.reply("lyrics not found");
+            return ctx.reply("❌ lyrics not found");
         }
         return ctx.reply(this.errorHandler(reqLyric))
 
