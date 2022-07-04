@@ -31,9 +31,17 @@ botHandler.on('text', async (ctx) => {
 
 });
 
-botHandler.on("callback_query", (ctx) => {
-    console.log(ctx);
-    ctx.reply("zamn daniel");
+botHandler.on("callback_query", async (ctx) => {
+    const {data} = ctx.callbackQuery;
+    if(typeof data === "string"){
+
+        let splitData = data.split(" ");
+        switch(splitData[0]){
+            case "getlyrics":
+                await bot.handleLyric(splitData[1],ctx);
+                break
+        }
+    }
 })
 
 botHandler.launch()
