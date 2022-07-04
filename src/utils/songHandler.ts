@@ -2,7 +2,10 @@ import axios from "axios";
 import { load,Element } from "cheerio";
 
 export type IslyricsOrSearch = "lyrics" | "search";
-export type ListData = Array<Record<string, string>>;
+export type ListData = Array<Record<"text" | "callback_data", string>>;
+export interface ErrorOutput {
+    "code" : string
+}
 
 export class SongHandler {
     readonly lyricsURL = "https://www.azlyrics.com/lyrics/";
@@ -21,7 +24,7 @@ export class SongHandler {
         return arg.split(" ").join("+")
     }
 
-    async requestData(parsedArg: string, type: IslyricsOrSearch, searchOption?: "lyrics" | "songs"): Promise<string | false> {
+    async requestData(parsedArg: string, type: IslyricsOrSearch, searchOption?: "lyrics" | "songs"): Promise<string | ErrorOutput> {
         try{
             const validateRequests = (dataRes:string)=>{
                 // to validate if the request has returned html containing no data
@@ -42,17 +45,17 @@ export class SongHandler {
             let data = await axios({
                 "url" : newLink,
                 "method" : "GET",
-                "timeout" : 5000, // you can adjust the amount of this time in ms
+                "timeout" : 5000, 
             });
 
             if(validateRequests(data.data)){
                 return data.data
             }
-            return false
+            return {code : "RNV"}
 
         }catch(e){
             console.log(e);
-            return false
+            throw(e)
         }
     }
 
@@ -74,8 +77,8 @@ export class SongHandler {
                     if(splitChild){
                         childElement = childElement.split("/lyrics/")[1].split("/").join("_")
                         list.push({
-                            "song" : `${seperateIt[0].split("\"").join(" ")} - ${searchOption === "lyrics" ? seperateIt[1].split("\n")[0] : seperateIt[1].split("\n")[0]}`,
-                            "link" : `${childElement}`
+                            "text" : `${seperateIt[0].split("\"").join(" ")} - ${searchOption === "lyrics" ? seperateIt[1].split("\n")[0] : seperateIt[1].split("\n")[0]}`,
+                            "callback_data" : `getlyrics ${childElement}`
                         })
                     }
                 }
@@ -86,36 +89,20 @@ export class SongHandler {
         return list;
     }
 
-    async getLyrics(parsedLink: string) {
-        try{
-            const data = await this.requestData(parsedLink, "lyrics") as string;
-            console.log("begin")
-            const $ = load(data);
-            const base = $("div.col-xs-12.col-lg-8.text-center");
-            let dataLyrics = base.children("div:not([class])");
-            let dataWriter = base.children("div.smt").children("small");
-            let panel = base.children("div.panel.album-panel.noprint");
-            let dataPanel: Array<string> = []
-            panel.each((i,el)=>{
-                console.log(i);
-                dataPanel.push($(el).text())
-            })
-            let lyrics =  dataLyrics.text().split("\n")
-            const tobeReturned = {
-                "Err" : false,
-                "status" : "perfectly fetched",
-                "message" : "no-log",
-                "content" : {
-                    "writer" : dataWriter.text().split("Writer(s):")[1],
-                    "lyrics" : lyrics.length == 0 ? false : lyrics,
-                    "additional" : dataPanel.length == 0 ? "no data to be displayed" : dataPanel
-                }
-            }
-            console.log(tobeReturned)
-            return tobeReturned
-        }catch(e){
-            console.log(e);
-            return false
-        }
+    getLyrics(data: string) {
+        const $ = load(data);
+        const base = $("div.col-xs-12.col-lg-8.text-center");
+        let dataLyrics = base.children("div:not([class])");
+        let dataWriter = base.children("div.smt").children("small");
+        let panel = base.children("div.panel.album-panel.noprint");
+        let dataPanel: Array<string> = []
+        panel.each((i,el)=>{
+            console.log(i);
+            dataPanel.push($(el).text())
+        })
+        let lyrics =  dataLyrics.text().split("\n")
+        const tobeReturned = lyrics.length == 0 ? false : lyrics;
+
+        return tobeReturned
     }
 }
