@@ -59,25 +59,22 @@ export class SongHandler {
         }
     }
 
-    searchSongHandler(data: string,searchOption: "lyrics" | "songs"){
+    searchSongHandler(data: string){
         const $ = load(data);
-        // console.log(data);
         let parsedHTML = $("table.table-condensed > tbody").children();
         let list: ListData = [];
 
-        parsedHTML.each((i, el: undefined | Element)=>{
+        parsedHTML.each((_, el: undefined | Element)=>{
             if($(el).children("td").attr("class") != undefined){
                 let seperateIt = $(el).children("td").children("a").text().split(" - ");
                 let childElement = $(el).children("td").children("a").attr("href");
-                console.log(i,`${seperateIt[0].split("\"").join(" ")} - ${searchOption === "lyrics" ? seperateIt[1].split("\n")[0] : seperateIt[1].split("\n")[0]}`)
-
 
                 if(childElement){
                     let splitChild = childElement.split("/lyrics/")[1];
                     if(splitChild){
                         childElement = childElement.split("/lyrics/")[1].split("/").join("_")
                         list.push({
-                            "text" : `${seperateIt[0].split("\"").join(" ")} - ${searchOption === "lyrics" ? seperateIt[1].split("\n")[0] : seperateIt[1].split("\n")[0]}`,
+                            "text" : `${seperateIt[0].split("\"").join(" ")} - ${seperateIt[1].split("\n")[0]}`,
                             "callback_data" : `getlyrics ${childElement}`
                         })
                     }
@@ -93,11 +90,10 @@ export class SongHandler {
         const $ = load(data);
         const base = $("div.col-xs-12.col-lg-8.text-center");
         let dataLyrics = base.children("div:not([class])");
-        let dataWriter = base.children("div.smt").children("small");
         let panel = base.children("div.panel.album-panel.noprint");
         let dataPanel: Array<string> = []
-        panel.each((i,el)=>{
-            console.log(i);
+
+        panel.each((_,el)=>{
             dataPanel.push($(el).text())
         })
         let lyrics =  dataLyrics.text().split("\n")

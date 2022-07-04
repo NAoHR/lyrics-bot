@@ -66,7 +66,7 @@ made with ❤️ by NAoHR (Najmi)
             }
             const reqData = await this.songHanlder.requestData(this.songHanlder.parseArg(arg, parseType), parseType, ssType);
             if(typeof reqData === "string"){
-                let listOfSong = this.songHanlder.searchSongHandler(reqData, ssType);
+                let listOfSong = this.songHanlder.searchSongHandler(reqData);
 
                 return ctx.replyWithMarkdown(`
 🔍 found ${listOfSong.length} song(s) based on *${arg}*
@@ -115,7 +115,7 @@ result:
             if(allLyric){
                 let parsedLyric = this.parseGivenLyrics(allLyric);
                 for(let i of parsedLyric){
-                    ctx.reply(i);
+                    await ctx.reply(i);
                 }
                 return ctx.replyWithMarkdown("✅ all done");
             }
