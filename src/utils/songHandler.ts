@@ -1,11 +1,6 @@
 import axios from "axios";
 import { load,Element } from "cheerio";
-
-export type IslyricsOrSearch = "lyrics" | "search";
-export type ListData = Array<Record<"text" | "callback_data", string>>;
-export interface ErrorOutput {
-    "code" : string
-}
+import {IslyricsOrSearch,ListData,ErrorOutput} from "./types";
 
 export class SongHandler {
     readonly lyricsURL = "https://www.azlyrics.com/lyrics/";

@@ -1,5 +1,6 @@
 import { Context, Telegraf, Markup } from "telegraf";
-import { SongHandler,IslyricsOrSearch, ErrorOutput, ListData } from "./songHandler";
+import {IslyricsOrSearch, ErrorOutput, ListData} from "./types";
+import { SongHandler } from "./songHandler";
 
 export class Bot{
     bot: Telegraf;
@@ -12,7 +13,7 @@ export class Bot{
     private errorHandler(e: ErrorOutput): string{
         switch(e.code){
             case "RNV":
-                return "song not found";
+                return "🚫 Oops we couldn't find any of that";
             default:
                 return "internal error"
         }
@@ -79,14 +80,13 @@ made with ❤️ by NAoHR (Najmi)
                 return ctx.replyWithMarkdown(`
 🔍 found ${listOfSong.length} song(s) based on *${arg}*
 result:
-                `, {
-                    reply_markup : {
-                        inline_keyboard : this.parseFoundSong(listOfSong)
-                    }
-                });
+                `,{
+                    ...Markup.inlineKeyboard(this.parseFoundSong(listOfSong))
+                }
+                );
             }
 
-            return ctx.reply(this.errorHandler(reqData));
+            return ctx.replyWithMarkdown(this.errorHandler(reqData));
 
         }catch(e){
             console.log(e);
