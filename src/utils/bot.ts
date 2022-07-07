@@ -51,7 +51,7 @@ made with ❤️ by NAoHR (Najmi)
 \`<command> <argument>\`
 
 *Example:*
-\t\`/sbsong what is love\`
+\t\`/sbtitle what is love\`
 \tthis command will search song with 'what is love' as its title
 
 \t\`/sblyric what is love\`
@@ -69,7 +69,7 @@ made with ❤️ by NAoHR (Najmi)
     }
     async songSearch(arg: string, parseType: IslyricsOrSearch,ssType: "lyrics" | "songs" ,ctx: Context) {
         try{
-            this.logger(`${ssType == "lyrics" ? "sblyric" : "sbsong"} ${arg}`);
+            this.logger(`${ssType == "lyrics" ? "sblyric" : "sbtitle"} ${arg}`);
             if(arg === ""){
                 return ctx.reply("🙅‍♂️ you didn't specify any song")
             }

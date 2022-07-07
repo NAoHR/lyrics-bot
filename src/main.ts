@@ -17,7 +17,7 @@ botHandler.on('text', async (ctx) => {
         const requested = command.slice(1).join(" ");
 
         switch(command[0].slice(1)){
-            case "sbsong":
+            case "sbtitle":
                 await bot.songSearch(requested, 'search', "songs", ctx);
                 break
             case "sblyric":
